@@ -19,6 +19,7 @@ import {
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { useState, useEffect } from "react";
+import Card from "./src/Components/Card";
 
 export default function App() {
   const [cardsPlayer, setCardsPlayer] = useState();
@@ -53,20 +54,37 @@ export default function App() {
   }, [db, playerNumber]);
 
   async function playCard(prop, index) {
+    alert(JSON.stringify(prop));
     if (
       (currentCard.number === prop.number ||
         currentCard.color === prop.color) &&
       currentCard.last !== playerNumber
     ) {
-      cardsPlayer.splice(index, 1);
-      await updateDoc(doc(db, "uno", "cards"), {
-        currentCard: {
-          number: prop.number,
-          color: prop.color,
-          last: playerNumber,
-        },
-        playerOne: cardsPlayer,
-      });
+      try {
+        cardsPlayer.splice(index, 1);
+        if (playerNumber === "1") {
+          await updateDoc(doc(db, "uno", "cards"), {
+            currentCard: {
+              number: prop.number,
+              color: prop.color,
+              last: "1",
+            },
+            playerOne: cardsPlayer,
+          });
+        }
+        if (playerNumber === "2") {
+          await updateDoc(doc(db, "uno", "cards"), {
+            currentCard: {
+              number: prop.number,
+              color: prop.color,
+              last: "2",
+            },
+            playerTwo: cardsPlayer,
+          });
+        }
+      } catch (err) {
+        alert(err);
+      }
     }
   }
 
@@ -75,26 +93,11 @@ export default function App() {
       <ScrollView>
         {cardsPlayer &&
           cardsPlayer.map((item, index) => (
-            <TouchableOpacity
-              onPress={() => playCard(item, index)}
-              style={{
-                backgroundColor: item.color,
-                height: 300,
-                width: 200,
-                alignItems: "center",
-                justifyContent: "center",
-                transform: [{ rotate: "90deg" }],
-              }}
-            >
-              <Text
-                style={{
-                  color: item.color === "yellow" ? "#000" : "#fff",
-                  fontSize: 50,
-                }}
-              >
-                {item.number}
-              </Text>
-            </TouchableOpacity>
+            <Card
+              color={item.color}
+              number={item.number}
+              playCard={() => playCard(item, index)}
+            />
           ))}
       </ScrollView>
       {/* <Text
@@ -130,7 +133,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "gray",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
