@@ -5,11 +5,16 @@ interface CardProps {
   number: any;
   color: string;
   playCard?: any;
+  skin: any;
 }
 
 const Card: React.FC<CardProps> = (props) => {
   return (
-    <ContainerCard color={props.color} onPress={() => props.playCard(props)}>
+    <ContainerCard
+      color={props.color}
+      onPress={() => props.playCard(props)}
+      skin={props.skin}
+    >
       {/* {props.number === "UNO" ? (
         <Circle color="red">
           <Logo>UNO</Logo>
@@ -17,8 +22,13 @@ const Card: React.FC<CardProps> = (props) => {
       ) : ( */}
       <>
         <MiniNumber color="top">{props.number}</MiniNumber>
-        <Circle color="#fff">
-          <Number color={props.color}>{props.number}</Number>
+        <Circle
+          color={props.skin === "default" ? "#fff" : props.color}
+          skin={props.skin}
+        >
+          <Number color={props.skin === "default" ? props.color : "#fff"}>
+            {props.number}
+          </Number>
         </Circle>
         <MiniNumber color="bottom">{props.number}</MiniNumber>
       </>

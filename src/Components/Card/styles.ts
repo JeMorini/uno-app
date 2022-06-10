@@ -1,21 +1,40 @@
 import styled from "styled-components";
 
 export const ContainerCard = styled.TouchableOpacity`
-  height: 200px;
-  width: 150px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: ${(props) =>
-    props.color === "yellow" ? "#F5D93D" : props.color};
-  margin-left: 50px;
-  border-width: 8px;
-  border-style: solid;
-  border-color: #fff;
-  border-radius: 8px;
-  box-shadow: 10px 5px 20px black;
-  transform: rotate(90deg);
+  elevation: 10;
+  ${(props) =>
+    props.skin === "default"
+      ? `
+    height: 200px;
+    width: 150px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: ${props.color};
+    margin-left: 50px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: #fff;
+    border-radius: 8px;
+    box-shadow: 10px 5px 20px black;
+    transform: rotate(90deg);
+    `
+      : `
+    height: 200px;
+    width: 150px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: ${props.color};
+    margin-left: 50px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: ${props.color};
+    border-radius: 8px;
+    box-shadow: 10px 5px 20px black;
+    transform: rotate(90deg);`};
 `;
 
 export const Circle = styled.View`
@@ -25,7 +44,7 @@ export const Circle = styled.View`
   align-items: center;
   justify-content: center;
   background-color: ${(props) => props.color};
-  border-radius: 50%;
+  border-radius: 500px;
   transform: rotate(30deg);
 `;
 
@@ -42,7 +61,7 @@ export const Logo = styled.Text`
 `;
 
 export const Number = styled.Text`
-  color: ${(props) => (props.color === "yellow" ? "#F5D93D" : props.color)};
+  color: ${(props) => props.color};
   text-shadow: 2px 2px 4px #000000;
   transform: rotate(-30deg);
   font-size: 70px;
