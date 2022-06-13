@@ -23,10 +23,9 @@ import { initializeApp } from "firebase/app";
 import { useState, useEffect } from "react";
 import Card from "./src/Components/Card";
 import AskCardButton from "./src/Components/AskCardButton";
-import OrderBy from "./src/Components/OrderBy";
 import Perfil from "./src/Components/Perfil";
 
-export default function App() {
+const App: React.FC = () => {
   const cards = [
     { number: 1, color: "#DB3C28" },
     { number: 2, color: "#DB3C28" },
@@ -65,9 +64,9 @@ export default function App() {
     { number: 8, color: "#F5D93D" },
     { number: 9, color: "#F5D93D" },
   ];
-  const [cardsPlayer, setCardsPlayer] = useState([]);
-  const [currentCard, setCurrentCard] = useState();
-  const [playerNumber, setPlayerNumber] = useState();
+  const [cardsPlayer, setCardsPlayer] = useState<any>([]);
+  const [currentCard, setCurrentCard] = useState<any>();
+  const [playerNumber, setPlayerNumber] = useState("");
   const [playerSkin, setPlayerSkin] = useState("");
   const [lastAsk, setLastAsk] = useState("");
   // const [orderBy, setOrderBy] = useState("number");
@@ -76,13 +75,7 @@ export default function App() {
   const [currentPlayer, setCurrentPlayer] = useState("");
 
   initializeApp({
-    apiKey: "AIzaSyCYA0pyPJNH7Knc4-1-pSXqzxhrAW_btLE",
-    authDomain: "unodb-dad4e.firebaseapp.com",
-    projectId: "unodb-dad4e",
-    storageBucket: "unodb-dad4e.appspot.com",
-    messagingSenderId: "260132756646",
-    appId: "1:260132756646:web:95007b3801f57f687ce867",
-    measurementId: "G-78JQGGFBS3",
+    //FIIREBASE-CONFIGS
   });
 
   const db = getFirestore();
@@ -90,7 +83,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      onSnapshot(q, (doc) => {
+      onSnapshot(q, (doc: any) => {
         if (playerNumber === "1") {
           setCardsPlayer(doc.data().playerOne);
           setPlayerSkin(doc.data().playerOneSkin);
@@ -178,8 +171,8 @@ export default function App() {
 
   async function playCard(prop, index) {
     if (
-      (currentCard.number === prop.number ||
-        currentCard.color === prop.color) &&
+      (currentCard?.number === prop.number ||
+        currentCard?.color === prop.color) &&
       currentPlayer === playerNumber
     ) {
       // if (orderBy === "color") {
@@ -265,7 +258,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         {cardsPlayer &&
-          cardsPlayer.map((item, index) => (
+          cardsPlayer.map((item: {color: string, number: string}, index) => (
             <Card
               color={item.color}
               number={item.number}
@@ -279,7 +272,6 @@ export default function App() {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
           setModalVisible(!modalVisible);
         }}
         style={{
@@ -406,3 +398,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
 });
+
+export default App
