@@ -85,3 +85,9 @@ bottom: 10px
 transform: rotate(-180deg);
       `}
 `;
+
+export const ImageCard = styled.Image`
+  height: 100px;
+  width: 100px;
+  transform: rotate(-30deg);
+`;

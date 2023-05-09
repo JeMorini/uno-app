@@ -24,6 +24,7 @@ import { useState, useEffect } from "react";
 import Card from "./src/Components/Card";
 import AskCardButton from "./src/Components/AskCardButton";
 import Perfil from "./src/Components/Perfil";
+import SelectColor from "./src/Components/SelectColor";
 
 const App: React.FC = () => {
   const cards = [
@@ -63,6 +64,7 @@ const App: React.FC = () => {
     { number: 7, color: "#F5D93D" },
     { number: 8, color: "#F5D93D" },
     { number: 9, color: "#F5D93D" },
+    { number: "+4", color: "#000" },
   ];
   const [cardsPlayer, setCardsPlayer] = useState<any>([]);
   const [currentCard, setCurrentCard] = useState<any>();
@@ -73,10 +75,9 @@ const App: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(true);
   const [selectedSkin, setSelectedSkin] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState("");
+  const [isSelectColor, setIsSelectColor] = useState(false);
 
-  initializeApp({
-    //FIIREBASE-CONFIGS
-  });
+  initializeApp();
 
   const db = getFirestore();
   const q = query(doc(db, "uno", "cards"));
@@ -170,6 +171,34 @@ const App: React.FC = () => {
   }
 
   async function playCard(prop, index) {
+    if (prop.color === "#000" && currentPlayer === playerNumber) {
+      setIsSelectColor(true);
+      cardsPlayer.splice(index, 1);
+      if (playerNumber === "1") {
+        await updateDoc(doc(db, "uno", "cards"), {
+          currentCard: {
+            number: prop.number,
+            color: prop.color,
+            last: "1",
+          },
+          playerOne: cardsPlayer,
+          lastAsk: "1",
+          currentPlayer: "1",
+        });
+      }
+      if (playerNumber === "2") {
+        await updateDoc(doc(db, "uno", "cards"), {
+          currentCard: {
+            number: prop.number,
+            color: prop.color,
+            last: "2",
+          },
+          playerTwo: cardsPlayer,
+          lastAsk: "2",
+          currentPlayer: "2",
+        });
+      }
+    }
     if (
       (currentCard?.number === prop.number ||
         currentCard?.color === prop.color) &&
@@ -229,6 +258,39 @@ const App: React.FC = () => {
     }
   }
 
+  async function selectColor(color) {
+    try {
+      // alert(prop);
+      if (playerNumber === "1") {
+        await updateDoc(doc(db, "uno", "cards"), {
+          currentCard: {
+            number: "all",
+            color: color,
+            last: "1",
+          },
+          playerOne: cardsPlayer,
+          lastAsk: "1",
+          currentPlayer: "2",
+        });
+      }
+      if (playerNumber === "2") {
+        await updateDoc(doc(db, "uno", "cards"), {
+          currentCard: {
+            number: "all",
+            color: color,
+            last: "2",
+          },
+          playerTwo: cardsPlayer,
+          lastAsk: "2",
+          currentPlayer: "1",
+        });
+      }
+      setIsSelectColor(false);
+    } catch (err) {
+      alert(err);
+    }
+  }
+
   // useEffect(() => {
   //   if (orderBy === "color") {
   //     cardsPlayer.sort(function (a, b) {
@@ -255,17 +317,29 @@ const App: React.FC = () => {
   // }, [orderBy]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        padding: 10,
+        backgroundColor: isSelectColor ? "#000" : "#B21308",
+        alignItems: "flex-end",
+        justifyContent: "center",
+        flexDirection: "row",
+      }}
+    >
       <ScrollView>
-        {cardsPlayer &&
-          cardsPlayer.map((item: {color: string, number: string}, index) => (
+        {cardsPlayer && isSelectColor ? (
+          <SelectColor selectColor={(color) => selectColor(color)} />
+        ) : (
+          cardsPlayer.map((item: { color: string; number: string }, index) => (
             <Card
               color={item.color}
               number={item.number}
               playCard={() => playCard(item, index)}
               skin={playerSkin}
             />
-          ))}
+          ))
+        )}
       </ScrollView>
       <Modal
         animationType="slide"
@@ -367,36 +441,29 @@ const App: React.FC = () => {
           </TouchableOpacity>
         </View>
       </Modal>
-      <View
-        style={{
-          justifyContent: "space-around",
-          alignItems: "center",
-          height: "100%",
-          width: "30%",
-        }}
-      >
-        <Perfil playerNumber={playerNumber} />
-        {/* <OrderBy orderBy={orderBy} /> */}
-        <AskCardButton
-          askCard={() => askCard(playerNumber)}
-          title="Pedir carta"
-        />
-        <AskCardButton askCard={pass} title="Passar vez" />
-      </View>
+      {isSelectColor ? (
+        <Text style={{ color: "#fff" }}>Selecionar cor</Text>
+      ) : (
+        <View
+          style={{
+            justifyContent: "space-around",
+            alignItems: "center",
+            height: "100%",
+            width: "30%",
+          }}
+        >
+          <Perfil playerNumber={playerNumber} />
+          {/* <OrderBy orderBy={orderBy} /> */}
+          <AskCardButton
+            askCard={() => askCard(playerNumber)}
+            title="Pedir carta"
+          />
+          <AskCardButton askCard={pass} title="Passar vez" />
+        </View>
+      )}
       <StatusBar style="auto" />
     </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: "#B21308",
-    alignItems: "flex-end",
-    justifyContent: "center",
-    flexDirection: "row",
-  },
-});
-
-export default App
+export default App;

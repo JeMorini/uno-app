@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { ContainerCard, Circle, Logo, Number, MiniNumber } from "./styles";
+import {
+  ContainerCard,
+  Circle,
+  Logo,
+  Number,
+  MiniNumber,
+  ImageCard,
+} from "./styles";
+import plusfour from "../../images/plusfour.png";
 
 interface CardProps {
   number: any;
@@ -26,9 +34,13 @@ const Card: React.FC<CardProps> = (props) => {
           color={props.skin === "default" ? "#fff" : props.color}
           skin={props.skin}
         >
-          <Number color={props.skin === "default" ? props.color : "#fff"}>
-            {props.number}
-          </Number>
+          {props.color !== "#000" ? (
+            <Number color={props.skin === "default" ? props.color : "#fff"}>
+              {props.number}
+            </Number>
+          ) : (
+            <ImageCard style={{ width: 100, height: 100 }} source={plusfour} />
+          )}
         </Circle>
         <MiniNumber color="bottom">{props.number}</MiniNumber>
       </>
