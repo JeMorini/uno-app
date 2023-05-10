@@ -67,6 +67,8 @@ const App: React.FC = () => {
     { number: "+4", color: "#000" },
   ];
   const [cardsPlayer, setCardsPlayer] = useState<any>([]);
+  const [cardsPlayerOne, setCardsPlayerOne] = useState<any>([]);
+  const [cardsPlayerTwo, setCardsPlayerTwo] = useState<any>([]);
   const [currentCard, setCurrentCard] = useState<any>();
   const [playerNumber, setPlayerNumber] = useState("");
   const [playerSkin, setPlayerSkin] = useState("");
@@ -93,6 +95,8 @@ const App: React.FC = () => {
           setCardsPlayer(doc.data().playerTwo);
           setPlayerSkin(doc.data().playerTwoSkin);
         }
+        setCardsPlayerOne(doc.data().playerOne);
+        setCardsPlayerTwo(doc.data().playerTwo);
         setCurrentCard(doc.data().currentCard);
         setLastAsk(doc.data().lastAsk);
         setCurrentPlayer(doc.data().currentPlayer);
@@ -172,7 +176,6 @@ const App: React.FC = () => {
 
   async function playCard(prop, index) {
     if (prop.color === "#000" && currentPlayer === playerNumber) {
-      setIsSelectColor(true);
       cardsPlayer.splice(index, 1);
       if (playerNumber === "1") {
         await updateDoc(doc(db, "uno", "cards"), {
@@ -198,34 +201,14 @@ const App: React.FC = () => {
           currentPlayer: "2",
         });
       }
+      buyCard(Number(prop.number.replace("+", "")), index);
+      return;
     }
     if (
       (currentCard?.number === prop.number ||
         currentCard?.color === prop.color) &&
       currentPlayer === playerNumber
     ) {
-      // if (orderBy === "color") {
-      //   cardsPlayer.sort(function (a, b) {
-      //     if (a.color > b.color) {
-      //       return 1;
-      //     }
-      //     if (a.color < b.color) {
-      //       return -1;
-      //     }
-      //     return 0;
-      //   });
-      // }
-      // if (orderBy === "number") {
-      //   cardsPlayer.sort(function (a, b) {
-      //     if (a.number > b.number) {
-      //       return 1;
-      //     }
-      //     if (a.number < b.number) {
-      //       return -1;
-      //     }
-      //     return 0;
-      //   });
-      // }
       try {
         cardsPlayer.splice(index, 1);
         if (playerNumber === "1") {
@@ -260,11 +243,10 @@ const App: React.FC = () => {
 
   async function selectColor(color) {
     try {
-      // alert(prop);
       if (playerNumber === "1") {
         await updateDoc(doc(db, "uno", "cards"), {
           currentCard: {
-            number: "all",
+            number: "+4",
             color: color,
             last: "1",
           },
@@ -276,7 +258,7 @@ const App: React.FC = () => {
       if (playerNumber === "2") {
         await updateDoc(doc(db, "uno", "cards"), {
           currentCard: {
-            number: "all",
+            number: "+4",
             color: color,
             last: "2",
           },
@@ -291,30 +273,41 @@ const App: React.FC = () => {
     }
   }
 
-  // useEffect(() => {
-  //   if (orderBy === "color") {
-  //     cardsPlayer.sort(function (a, b) {
-  //       if (a.color > b.color) {
-  //         return 1;
-  //       }
-  //       if (a.color < b.color) {
-  //         return -1;
-  //       }
-  //       return 0;
-  //     });
-  //   }
-  //   if (orderBy === "number") {
-  //     cardsPlayer.sort(function (a, b) {
-  //       if (a.number > b.number) {
-  //         return 1;
-  //       }
-  //       if (a.number < b.number) {
-  //         return -1;
-  //       }
-  //       return 0;
-  //     });
-  //   }
-  // }, [orderBy]);
+  async function buyCard(number, index) {
+    setIsSelectColor(true);
+
+    if (currentPlayer === "1") {
+      for (var i = 0; i < number; i++) {
+        const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
+        cardsPlayerTwo.push({
+          number: cards[Number(randomNumber)].number,
+          color: cards[Number(randomNumber)].color,
+        });
+      }
+
+      await updateDoc(doc(db, "uno", "cards"), {
+        playerTwo: cardsPlayerTwo,
+        lastAsk: "1",
+      });
+      return;
+    }
+
+    if (currentPlayer === "2") {
+      for (var i = 0; i < number; i++) {
+        const randomNumber = (Math.random() * (35 - 0) + 0).toFixed(0);
+        cardsPlayerOne.push({
+          number: cards[Number(randomNumber)].number,
+          color: cards[Number(randomNumber)].color,
+        });
+      }
+
+      await updateDoc(doc(db, "uno", "cards"), {
+        playerOne: cardsPlayerOne,
+        lastAsk: "2",
+      });
+      return;
+    }
+  }
 
   return (
     <SafeAreaView
